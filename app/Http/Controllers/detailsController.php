@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\detailsRequest;
 use App\Http\Resources\driverResource;
+use App\Http\Resources\vehiclesResource;
 use App\Models\Details;
 use Illuminate\Http\Request;
 use App\Http\Resources\detailsCollection;
@@ -83,21 +84,17 @@ class detailsController extends Controller
      * @param  \App\Models\Details  $details
      * @return array
      */
-    public function update(detailsRequest $request, Details $details)
+    public function update(detailsRequest $request, Details $details, $id)
     {
         $details->update($request->all());
+
         if($request) {
-            return [
-                'status' => 'OK',
-                'success' => true,
-                'message' => 'Driver information updated!',
-                'data' => new detailsResource($request)];
+
+            $detail = Details::find($id)->where('drivers_id',$id)->update($request->all());
+
+            return response()->success('Driver information updated!',new detailsResource($detail));
         } else {
-            return [
-                'status' => 'ERROR',
-                'success' => false,
-                'message' => 'Driver information could not be updated!',
-                'data' => new detailsResource($request)];
+            return response()->error('Driver information could not be updated!',new detailsResource($request));
         }
     }
 

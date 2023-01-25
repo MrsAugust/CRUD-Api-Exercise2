@@ -84,21 +84,14 @@ class driversController extends Controller
      * @param  \App\Models\Drivers  $drivers
      * @return array
      */
-    public function update(driversRequest $request, Drivers $drivers)
+    public function update(driversRequest $request, $id)
     {
-        $drivers->update($request->all());
+//        $drivers->update($request->all());
         if($request) {
-            return [
-                'status' => 'OK',
-                'success' => true,
-                'message' => 'Driver account updated!',
-                'data' => new driverResource($request)];
+            $driver = Drivers::find($id)->update($request->all());
+            return response()->success('Driver account updated!',new driverResource($driver));
         } else {
-            return [
-                'status' => 'ERROR',
-                'success' => false,
-                'message' => 'Driver account could not be updated!',
-                'data' => new driverResource($request)];
+            return response()->error('Driver account could not be updated!',new driverResource($request));
         }
     }
 
@@ -113,17 +106,11 @@ class driversController extends Controller
         $drivers = Drivers::find($id);
         $drivers->delete();
 
-//        if(!Drivers::find($drivers['id']))
-//        {
-//            return[
-//                'status' => 'OK',
-//                'success' => true,
-//                'message' => 'Driver account deleted!'];
-//        } else {
-//            return[
-//                'status' => 'ERROR',
-//                'success' => false,
-//                'message' => 'Driver account could not be deleted.'];
-//        }
+        if(!Drivers::find($drivers['id']))
+        {
+            return response()->success('Driver account deleted!',[]);
+        } else {
+            return response()->error('Driver account could not be deleted.',[]);
+        }
     }
 }

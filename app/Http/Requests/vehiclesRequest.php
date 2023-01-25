@@ -29,7 +29,7 @@ class vehiclesRequest extends FormRequest
                 'vehicle_model' => ['required'],
                 'year' => ['required'],
                 'insured' => ['required'],
-                'service_date' => ['required'],
+                'capacity' => ['required']
             ];
         } else {
             return [
@@ -38,7 +38,7 @@ class vehiclesRequest extends FormRequest
                 'vehicle_model' => ['sometimes','required'],
                 'year' => ['sometimes','required'],
                 'insured' => ['sometimes','required'],
-                'service_date' => ['sometimes','required'],
+                'capacity' => ['sometimes','required']
             ];
         }
     }

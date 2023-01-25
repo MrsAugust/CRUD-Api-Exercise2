@@ -19,8 +19,8 @@ class CreateDriversDetailsTable extends Migration
                 ->references('id')->on('drivers')
             ->cascadeOnDelete();
             $table->string('home_address',100)->nullable();
-            $table->string('first_name',25)->nullable();
-            $table->string('last_name',25)->nullable();
+            $table->string('first_name',30)->nullable();
+            $table->string('last_name',30)->nullable();
             $table->char('license_type',1)->nullable();
             $table->dateTime('last_trip_date')->nullable();
             $table->timestamps();

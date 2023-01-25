@@ -105,20 +105,13 @@ class vehiclesController extends Controller
 //        'service_date' => 'service date is required.',
 //        'capacity' => 'vehicle capacity is required.'
 //    };
+        $vehicles->update($request->all());
 
         if($request) {
-            $vehicles->update($request->all());
-            return [
-                'status' => 'OK',
-                'success' => true,
-                'message' => 'Vehicle details updated!',
-                'data' => new vehiclesResource($request)];
+            $vehicle = Vehicles::find($request->id)->update($request->all());
+            return response()->success('Vehicle details updated!',new vehiclesResource($vehicle));
         } else {
-            return [
-                'status' => 'ERROR',
-                'success' => false,
-                'message' => 'Vehicle details could not be updated!',
-                'data' => new vehiclesResource($request)];
+            return response()->error('Vehicle details could not be updated!',new vehiclesResource($request));
         }
     }
 
@@ -135,15 +128,9 @@ class vehiclesController extends Controller
 
         if(!Vehicles::find($vehicles['id']))
         {
-            return[
-                'status' => 'OK',
-                'success' => true,
-                'message' => 'Vehicle deleted!'];
+            return response()->success('Vehicle deleted!',[]);
         } else {
-            return[
-                'status' => 'ERROR',
-                'success' => false,
-                'message' => 'Vehicle could not be deleted.'];
+            return response()->error('Vehicle could not be deleted.',[]);
         }
     }
 }
