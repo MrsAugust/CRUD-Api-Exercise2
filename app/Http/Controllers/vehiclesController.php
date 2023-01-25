@@ -60,11 +60,11 @@ class vehiclesController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Vehicles  $vehicles
-     * @return vehiclesResource
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function show($id)
     {
-        return new vehiclesResource(Vehicles::find($id));
+        return vehiclesResource::collection(Vehicles::all()->where('drivers_id',$id));
     }
 
     /**

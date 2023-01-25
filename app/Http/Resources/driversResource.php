@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Vehicles;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class driversResource extends JsonResource
@@ -19,7 +20,7 @@ class driversResource extends JsonResource
             'id_number' => $this->id_number,
             'phone_number' => $this->phone_number,
             'details' => new detailsResource($this->details),
-            'vehicles' => [new vehiclesResource($this->vehicles)]
+            'vehicles' => $this->vehicles = vehiclesResource::collection(Vehicles::all()->where('drivers_id',$this->id))
         ];
     }
 }
