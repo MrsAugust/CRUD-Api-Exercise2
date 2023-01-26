@@ -20,7 +20,7 @@ class driversResource extends JsonResource
             'id_number' => $this->id_number,
             'phone_number' => $this->phone_number,
             'details' => new detailsResource($this->details),
-            'vehicles' => $this->vehicles = vehiclesResource::collection(Vehicles::all()->where('drivers_id',$this->id))
+            'vehicles' => $this->vehicles = vehiclesResource::collection(Vehicles::all()->where('drivers_id',$this->id))    //optimize
         ];
     }
 }

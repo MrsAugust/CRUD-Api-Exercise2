@@ -8,6 +8,7 @@ use App\Http\Resources\driverResource;
 use App\Http\Resources\driversResource;
 use App\Models\Details;
 use App\Models\Drivers;
+use Illuminate\Validation\Validator;
 
 class driversController extends Controller
 {
@@ -40,6 +41,10 @@ class driversController extends Controller
     public function store(StoreDriversRequest $request)
     {
         $data = $request->all();
+        $validate = $request->validate([
+            'id_number' => ['required'],
+            'phone_number' => ['required|digit|max:15'],
+        ]);
 
         $driver = Drivers::create($request->all());
         $details = new Details($data);

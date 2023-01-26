@@ -26,11 +26,11 @@ class vehiclesController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return array[]
      */
-    public function create()
+    public function create(vehiclesRequest $request)
     {
-        //
+
     }
 
     /**
@@ -39,21 +39,28 @@ class vehiclesController extends Controller
      * @param  \Illuminate\Http\Vehicles  $vehicles
      * @return vehiclesResource
      */
-    public function store(Request $request)
+    public function store(StoreVehiclesRequest $request)
     {
-//        $validated = $request->validate([
-//            'license_plate_number' => 'required|unique:posts|max:255',
-//            'vehicle_make' => 'required',
-//            'vehicle_model' => ,
-//            'year' => ,
-//            'insured' => ,
-//            'service_date' => ,
-//            'capacity' => 'required'
-//        ]);
+        $validated = $request->validate([
+//            'id' => ['required|digit'],
+            'license_plate_number' => ['required'],
+            'vehicle_make' => ['required'],
+            'vehicle_model' => ['required'],
+            'year' => ['required|digit|max:2023'],
+            'insured' => ['sometimes','required'],
+            'service_date' => ['sometimes','required'],
+            'capacity' => ['required|digit|max:21']
+        ]);
 
-        $vehicle = new Vehicles($request->all());
-        $vehicle->save();
-        return new vehiclesResource(Vehicles::find($vehicle->id));
+        if($validated)
+        {
+            $vehicle = new Vehicles($request->all());
+            $vehicle->save();
+            return response()->success('Vehicle details updated!',new vehiclesResource(Vehicles::find($vehicle->id)));
+        } else {
+            return response()->error('Vehicle details could not be updated.', $request);
+        }
+
     }
 
     /**
@@ -83,9 +90,9 @@ class vehiclesController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Vehicles  $vehicles
-     * @return array
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(vehiclesRequest $request, Vehicles $vehicles)
+    public function update(vehiclesRequest $request, $id)
     {
 //        $validate = Validator::make($request)->
 //        {
@@ -105,13 +112,16 @@ class vehiclesController extends Controller
 //        'service_date' => 'service date is required.',
 //        'capacity' => 'vehicle capacity is required.'
 //    };
-        $vehicles->update($request->all());
+//        $vehicles->update($request->all());
 
-        if($request) {
-            $vehicle = Vehicles::find($request->id)->update($request->all());
-            return response()->success('Vehicle details updated!',new vehiclesResource($vehicle));
+        $vehicle = Vehicles::query()->find($id);
+
+        if($vehicle) {
+
+            $vehicle->update($request->all());
+            return response()->json(new vehiclesResource($vehicle));
         } else {
-            return response()->error('Vehicle details could not be updated!',new vehiclesResource($request));
+            return response()->json(new vehiclesResource($request),404);
         }
     }
 
