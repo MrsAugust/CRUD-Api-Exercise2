@@ -8,18 +8,27 @@ use App\Http\Resources\driverResource;
 use App\Http\Resources\driversResource;
 use App\Models\Details;
 use App\Models\Drivers;
+use Exception as e;
+use http\Exception\RuntimeException;
 use Illuminate\Validation\Validator;
+use Throwable;
 
 class driversController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        return driversResource::collection(Drivers::all());
+        try {
+            $validate = Drivers::all();
+            return response()->json(driversResource::collection($validate));
+        } catch (Throwable $e)
+        {
+            return response()->json($validate,404);
+        }
     }
 
     /**
@@ -64,11 +73,18 @@ class driversController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\
-     * @return driversResource
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
-        return new driversResource(Drivers::find($id));
+        try {
+            return response()->json(new driversResource(Drivers::find($id)));
+
+        } catch (Throwable $throwable)
+        {
+            return response()->json([]);
+        }
+
     }
 
     /**
@@ -91,9 +107,9 @@ class driversController extends Controller
      */
     public function update(driversRequest $request, $id)
     {
-//        $drivers->update($request->all());
-        if($request) {
-            $driver = Drivers::find($id)->update($request->all());
+        $driver = Drivers::query()->find($id);
+        if($driver) {
+            $driver->update($request->all());
             return response()->success('Driver account updated!',new driverResource($driver));
         } else {
             return response()->error('Driver account could not be updated!',new driverResource($request));

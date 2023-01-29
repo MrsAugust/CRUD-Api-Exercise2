@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\driversController;
+use App\Http\Controllers\usersController;
 use App\Http\Controllers\vehiclesController;
 use App\Http\Controllers\detailsController;
 use Illuminate\Http\Request;
@@ -35,7 +36,6 @@ Route::post('vehicle', [vehiclesController::class, 'store']);
 Route::apiResource('drivers', driversController::class);  //returns all the drivers
 Route::apiResource('vehicles', vehiclesController::class);  //returns all the vehicles
 Route::get('driver/{id}',[driversController::class, 'show']); //returns 1-specified driver/details/vehicle
-Route::get('driver/{id}/details', [detailsController::class, 'show']);  //returns the details of 1-driver
 Route::get('driver/{id}/vehicle', [vehiclesController::class, 'show']); //returns the vehicle of 1-driver
 
 /**
@@ -43,7 +43,7 @@ Route::get('driver/{id}/vehicle', [vehiclesController::class, 'show']); //return
  **/
 
 Route::put('drivers/{id}', [driversController::class, 'update']);
-Route::put('drivers/{id}/details', [detailsController::class, 'update']);
+Route::put('drivers/{id}/details', [usersController::class, 'update']);
 Route::put('vehicle/{id}', [vehiclesController::class, 'update']);
 
 /**
@@ -51,5 +51,5 @@ Route::put('vehicle/{id}', [vehiclesController::class, 'update']);
  **/
 
 Route::delete('drivers/{id}', [driversController::class, 'destroy']);
-Route::delete('drivers/{id}/details', [detailsController::class, 'destroy']);
+Route::delete('drivers/{id}/details', [usersController::class, 'destroy']);
 Route::delete('vehicle/{id}', [vehiclesController::class, 'destroy']);

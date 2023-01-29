@@ -8,7 +8,8 @@ use App\Http\Resources\vehiclesCollection;
 use App\Http\Resources\vehiclesResource;
 use App\Models\Vehicles;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class vehiclesController extends Controller
 {
@@ -16,11 +17,18 @@ class vehiclesController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        return vehiclesResource::collection(Vehicles::all());
+        try {
+            $validate = Vehicles::all();
+            return response()->json(vehiclesResource::collection(Vehicles::all()));
+        } catch (Throwable $e)
+        {
+            return response()->json($validate,404);
+        }
+
     }
 
     /**
@@ -67,11 +75,17 @@ class vehiclesController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Vehicles  $vehicles
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
-        return vehiclesResource::collection(Vehicles::all()->where('drivers_id',$id));
+        try {
+            return response()->json(vehiclesResource::collection(Vehicles::all()->where('drivers_id',$id)));
+        } catch (Throwable $throwable)
+        {
+            return response()->json([]);
+        }
+
     }
 
     /**
@@ -94,34 +108,23 @@ class vehiclesController extends Controller
      */
     public function update(vehiclesRequest $request, $id)
     {
-//        $validate = Validator::make($request)->
-//        {
-//        'license_plate_number' => 'required|unique:posts|max:255',
-//        'vehicle_make' => 'required',
-//        'vehicle_model' => 'required',
-//        'year' => 'required',
-//        'insured' => 'required',
-//        'service_date' => 'required',
-//        'capacity' => 'required'
-//        } else {
-//        'license_plate_number' => 'license plate number is required.',
-//        'vehicle_make' => 'vehicle make is required.',
-//        'vehicle_model' => 'vehicle model is required.',
-//        'year' => 'year is required.',
-//        'insured' => 'insurance is required',
-//        'service_date' => 'service date is required.',
-//        'capacity' => 'vehicle capacity is required.'
-//    };
-//        $vehicles->update($request->all());
+        $rules = array(
+            'license_plate_number' => 'required',
+            'vehicle_make' => 'required',
+            'vehicle_model' => 'required',
+            'year' => 'required',
+            'insured' => 'required',
+            'service_date' => 'required',
+            'capacity' => 'required');
 
+        $validate = Validator::make($request->all(),$rules);
         $vehicle = Vehicles::query()->find($id);
 
-        if($vehicle) {
-
+        if($validate->fails() || !$vehicle) {
+            return response()->json([],404);
+        } else {
             $vehicle->update($request->all());
             return response()->json(new vehiclesResource($vehicle));
-        } else {
-            return response()->json(new vehiclesResource($request),404);
         }
     }
 

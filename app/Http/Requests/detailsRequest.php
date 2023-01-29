@@ -19,26 +19,13 @@ class detailsRequest extends FormRequest
      */
     public function rules()
     {
-        $method = $this->method();
-
-        if($method == 'PUT')
-        {
-            return [
-                'home_address' => ['required'],
-                'first_name' => ['required'],
-                'last_name' => ['required'],
-                'license_type' => ['required'],
-                'last_trip_date' => ['required'],
-            ];
-        } else {
-            return [
-                'home_address' => ['sometimes','required'],
-                'first_name' => ['sometimes','required'],
-                'last_name' => ['sometimes','required'],
-                'license_type' => ['sometimes','required'],
-                'last_trip_date' => ['sometimes','required'],
-            ];
-        }
+        return [
+            'home_address' => ['required'],
+            'first_name' => ['required'],
+            'last_name' => ['required'],
+            'license_type' => ['required'],
+            'last_trip_date' => ['required'],
+        ];
     }
 
     protected function prepareForValidation()

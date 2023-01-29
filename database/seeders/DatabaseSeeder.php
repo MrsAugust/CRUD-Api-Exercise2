@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Details;
+use App\Models\User;
+// use Illuminate\Foundation\Auth\Users;
 use App\Models\Drivers;
 use App\Models\Vehicles;
 use Illuminate\Database\Seeder;
@@ -17,9 +18,10 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
 
-//        Drivers::factory(5)->create();
-//        Details::factory(5)->create();
-//        Vehicles::factory(5)->create();
-        $this->call([DriversSeeder::class]);
+        User::factory(5)->create();
+//        $this->call([UsersSeeder::class]);
+       Drivers::factory(5)->create();
+       Vehicles::factory(5)->create();
+//         $this->call([DriversSeeder::class]);
     }
 }

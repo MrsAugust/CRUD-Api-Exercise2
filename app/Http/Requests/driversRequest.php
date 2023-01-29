@@ -19,20 +19,11 @@ class driversRequest extends FormRequest
      */
     public function rules()
     {
-        $method = $this->method();
+        return [
+            'id_number' => ['required|digit'],
+            'phone_number' => ['required|digit'],
+        ];
 
-        if($method == 'PUT')
-        {
-            return [
-                'id_number' => ['required'],
-                'phone_number' => ['required'],
-            ];
-        } else {
-            return [
-                'id_number' => ['sometimes', 'required'],
-                'phone_number' => ['sometimes', 'required'],
-            ];
-        }
     }
 
     protected function prepareForValidation()

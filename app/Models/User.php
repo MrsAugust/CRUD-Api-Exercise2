@@ -18,9 +18,12 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'drivers_id',
+        'first_name',
+        'last_name',
         'email',
         'password',
+        'home_address'
     ];
 
     /**
@@ -41,4 +44,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function drivers()
+    {
+        return $this->belongsTo(Drivers::class,'users_id','id');
+    }
 }

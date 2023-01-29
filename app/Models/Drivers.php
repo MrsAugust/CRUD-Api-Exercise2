@@ -11,15 +11,18 @@ class Drivers extends Model
 
     protected $fillable = [
         'id_number',
-        'phone_number'
+        'phone_number',
+        'last_trip_date',
+        'license_type'
     ];
 
     /**
      * Get the details of the category
      */
-    public function details()
+
+    public function users()
     {
-        return $this->hasOne(Details::class);
+        return $this->belongsTo(User::class, 'users_id','id');
     }
 
     public function vehicles()
