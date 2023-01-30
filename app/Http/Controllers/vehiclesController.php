@@ -50,7 +50,6 @@ class vehiclesController extends Controller
     public function store(StoreVehiclesRequest $request)
     {
         $validated = $request->validate([
-//            'id' => ['required|digit'],
             'license_plate_number' => ['required'],
             'vehicle_make' => ['required'],
             'vehicle_model' => ['required'],

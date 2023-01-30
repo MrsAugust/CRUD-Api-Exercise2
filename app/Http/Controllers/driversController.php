@@ -8,6 +8,7 @@ use App\Http\Resources\driverResource;
 use App\Http\Resources\driversResource;
 use App\Models\Details;
 use App\Models\Drivers;
+use App\Models\User;
 use Exception as e;
 use http\Exception\RuntimeException;
 use Illuminate\Validation\Validator;
@@ -47,25 +48,24 @@ class driversController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return string
      */
-    public function store(StoreDriversRequest $request)
+    public function store(driversRequest $request)
     {
-        $data = $request->all();
-        $validate = $request->validate([
+        $validated = $request->validate([
             'id_number' => ['required'],
-            'phone_number' => ['required|digit|max:15'],
+            'phone_number' => ['required'],
+            'home_address' => ['required'],
+            'first_name' => ['required'],
+            'last_name' => ['required'],
+            'license_type' => ['required']
         ]);
 
-        $driver = Drivers::create($request->all());
-        $details = new Details($data);
+        if ($validated) {
+            $user = User::create($validated);
+            $driver = Drivers::create($validated,$user->id);
+            return response()->success('Driver information deleted', Drivers::find($driver->id));
 
-        $details->drivers_id = $driver->id;
-        $details->save();
-
-        if(Drivers::find($driver->id) && Details::find()->where('drivers_id',$driver->id))
-        {
-            return response()->success('Driver information deleted',Drivers::find($driver->id));
         } else {
-            return response()->error('Driver information could not be deleted.',[]);
+            return response()->error('Driver information could not be deleted.', []);
         }
     }
 

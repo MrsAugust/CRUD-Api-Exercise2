@@ -22,8 +22,7 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'email',
-        'password',
-        'home_address'
+        'password'
     ];
 
     /**
@@ -44,6 +43,15 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public static function create(array $array)
+    {
+        $user = new User();
+        $user->first_name = $array['first_name'];
+        $user->last_name = $array['last_name'];
+        $user->save();
+        return $user;
+    }
 
     public function drivers()
     {

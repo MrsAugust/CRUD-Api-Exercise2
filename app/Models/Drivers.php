@@ -12,9 +12,23 @@ class Drivers extends Model
     protected $fillable = [
         'id_number',
         'phone_number',
+        'home_address',
         'last_trip_date',
         'license_type'
     ];
+
+    public static function create(array $array,$id)
+    {
+
+        $driver = new Drivers();
+        $driver->users_id = $id;
+        $driver->id_number = $array['id_number'];
+        $driver->phone_number = $array['phone_number'];
+        $driver->home_address = $array['home_address'];
+        $driver->license_type = $array['license_type'];
+        $driver->save();
+        return $driver;
+    }
 
     /**
      * Get the details of the category

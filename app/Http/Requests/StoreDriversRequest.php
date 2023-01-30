@@ -24,6 +24,10 @@ class StoreDriversRequest extends FormRequest
         return [
             'id_number' => ['required'],
             'phone_number' => ['required'],
+            'home_address' => ['required'],
+            'first_name' => ['required'],
+            'last_name' => ['required'],
+            'license_type' => ['required'],
         ];
     }
 

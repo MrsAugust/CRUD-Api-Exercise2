@@ -20,8 +20,12 @@ class driversRequest extends FormRequest
     public function rules()
     {
         return [
-            'id_number' => ['required|digit'],
-            'phone_number' => ['required|digit'],
+            'id_number' => ['required'],
+            'phone_number' => ['required'],
+            'home_address' => ['required'],
+            'first_name' => ['required'],
+            'last_name' => ['required'],
+            'license_type' => ['required']
         ];
 
     }
