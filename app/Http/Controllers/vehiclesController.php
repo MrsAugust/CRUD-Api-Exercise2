@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\vehiclesRequest;
-use App\Http\Resources\driversResource;
+use App\Http\Requests\StoreVehiclesRequest;
 use App\Http\Resources\vehiclesResource;
 use App\Models\Vehicles;
+use http\Client\Request;
 use Illuminate\Support\Facades\Validator;
-use Throwable;
 
 class vehiclesController extends Controller
 {
@@ -55,27 +55,29 @@ class vehiclesController extends Controller
      * @param  \Illuminate\Http\Vehicles  $vehicles
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(StoreVehiclesRequest $request)
+    public function store(vehiclesRequest $request)
     {
         $validated = $request->validate([
-            'license_plate_number' => ['required'],
-            'vehicle_make' => ['required'],
-            'vehicle_model' => ['required'],
-            'year' => ['required|digit|max:2023'],
-            'insured' => ['sometimes','required'],
-            'service_date' => ['sometimes','required'],
-            'capacity' => ['required|digit|max:21']
+            'license_plate_number' => 'required',
+            'vehicle_make' => 'required',
+            'vehicle_model' => 'required',
+            'year' => 'required',
+            'insured' => 'required',
+            'service_date' => 'required',
+            'capacity' => 'required',
+            'drivers_id' => 'required'
         ]);
 
         try
         {
-            $vehicle = new Vehicles($request->all());
-            $vehicle->save();
+
+            $vehicle = Vehicles::create($validated);
+
             $response = [
                 'message' => "Vehicle details updated!",
                 'status' => "OK",
                 'success' => true,
-                'data' => new vehiclesResource(Vehicles::find($vehicle->id))
+                'data' => new vehiclesResource($vehicle)
             ];
             return response()->json($response);
         } catch (\Exception $exception) {
@@ -83,7 +85,7 @@ class vehiclesController extends Controller
             'message' => "Vehicle details could not be updated.",
             'status' => "ERROR",
             'success' => false,
-            'data' => new vehiclesResource(Vehicles::find($request->id))
+            'data' => new vehiclesResource($request)
         ];
         return response()->json($fail);
         }

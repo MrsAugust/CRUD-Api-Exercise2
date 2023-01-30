@@ -20,11 +20,13 @@ class vehiclesRequest extends FormRequest
     public function rules()
     {
         return [
+            'drivers_id' => ['required'],
             'license_plate_number' => ['required'],
             'vehicle_make' => ['required'],
             'vehicle_model' => ['required'],
             'year' => ['required'],
             'insured' => ['required'],
+            'service_date' => ['required'],
             'capacity' => ['required']
         ];
     }
