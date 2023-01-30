@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\vehiclesRequest;
-use App\Http\Resources\driverResource;
-use App\Http\Resources\vehiclesCollection;
+use App\Http\Resources\driversResource;
 use App\Http\Resources\vehiclesResource;
 use App\Models\Vehicles;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
@@ -23,10 +21,20 @@ class vehiclesController extends Controller
     {
         try {
             $validate = Vehicles::all();
-            return response()->json(vehiclesResource::collection(Vehicles::all()));
-        } catch (Throwable $e)
-        {
-            return response()->json($validate,404);
+            $response = [
+                'message' => "Vehicles found!",
+                'status' => "OK",
+                'success' => true,
+                'data' => vehiclesResource::collection($validate)
+            ];
+            return response()->json($response);
+        } catch (\Exception $exception) {
+            $fail = [
+                'message' => "Vehicles not found!",
+                'status' => "ERROR",
+                'success' => false
+            ];
+            return response()->json($fail);
         }
 
     }
@@ -45,7 +53,7 @@ class vehiclesController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Vehicles  $vehicles
-     * @return vehiclesResource
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreVehiclesRequest $request)
     {
@@ -59,13 +67,25 @@ class vehiclesController extends Controller
             'capacity' => ['required|digit|max:21']
         ]);
 
-        if($validated)
+        try
         {
             $vehicle = new Vehicles($request->all());
             $vehicle->save();
-            return response()->success('Vehicle details updated!',new vehiclesResource(Vehicles::find($vehicle->id)));
-        } else {
-            return response()->error('Vehicle details could not be updated.', $request);
+            $response = [
+                'message' => "Vehicle details updated!",
+                'status' => "OK",
+                'success' => true,
+                'data' => new vehiclesResource(Vehicles::find($vehicle->id))
+            ];
+            return response()->json($response);
+        } catch (\Exception $exception) {
+        $fail = [
+            'message' => "Vehicle details could not be updated.",
+            'status' => "ERROR",
+            'success' => false,
+            'data' => new vehiclesResource(Vehicles::find($request->id))
+        ];
+        return response()->json($fail);
         }
 
     }
@@ -79,10 +99,21 @@ class vehiclesController extends Controller
     public function show($id)
     {
         try {
-            return response()->json(vehiclesResource::collection(Vehicles::all()->where('drivers_id',$id)));
-        } catch (Throwable $throwable)
+            $response = [
+                'message' => "Driver vehicle found!",
+                'status' => "OK",
+                'success' => true,
+                'data' => vehiclesResource::collection(Vehicles::all()->where('drivers_id',$id))
+            ];
+            return response()->json($response);
+        } catch (\Exception $exception)
         {
-            return response()->json([]);
+            $fail = [
+                'message' => "Driver vehicle not found",
+                'status' => "ERROR",
+                'success' => false
+            ];
+            return response()->json($fail);
         }
 
     }
@@ -115,15 +146,28 @@ class vehiclesController extends Controller
             'insured' => 'required',
             'service_date' => 'required',
             'capacity' => 'required');
+        try {
 
         $validate = Validator::make($request->all(),$rules);
         $vehicle = Vehicles::query()->find($id);
+        $vehicle->update($request->all());
 
-        if($validate->fails() || !$vehicle) {
-            return response()->json([],404);
-        } else {
-            $vehicle->update($request->all());
-            return response()->json(new vehiclesResource($vehicle));
+            $response = [
+                'message' => "Vehicle details updated!",
+                'status' => "OK",
+                'success' => true,
+                'data' => $vehicle
+            ];
+            return response()->json($response);
+
+        } catch (\Exception $exception) {
+            $fail = [
+                'message' => "Vehicle details could not be updated.",
+                'status' => "ERROR",
+                'success' => false,
+                'data' => Vehicles::find($id)
+            ];
+            return response()->json($fail);
         }
     }
 
@@ -131,18 +175,28 @@ class vehiclesController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Vehicles  $vehicles
-     * @return array
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
+        try {
+
         $vehicles = Vehicles::find($id);
         $vehicles->delete();
 
-        if(!Vehicles::find($vehicles['id']))
-        {
-            return response()->success('Vehicle deleted!',[]);
-        } else {
-            return response()->error('Vehicle could not be deleted.',[]);
+        $response = [
+            'message' => "Vehicle deleted!",
+            'status' => "OK",
+            'success' => true
+            ];
+            return response()->json($response);
+        } catch (\Exception $exception) {
+            $fail = [
+                'message' => "Vehicle could not be deleted.",
+                'status' => "ERROR",
+                'success' => false
+            ];
+            return response()->json($fail);
         }
     }
 }

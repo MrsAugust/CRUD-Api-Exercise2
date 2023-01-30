@@ -3,16 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\driversRequest;
-use App\Http\Requests\StoreDriversRequest;
 use App\Http\Resources\driverResource;
 use App\Http\Resources\driversResource;
-use App\Models\Details;
 use App\Models\Drivers;
 use App\Models\User;
-use Exception as e;
-use http\Exception\RuntimeException;
-use Illuminate\Validation\Validator;
-use Throwable;
+use Exception;
 
 class driversController extends Controller
 {
@@ -25,12 +20,24 @@ class driversController extends Controller
     {
         try {
             $validate = Drivers::all();
-            return response()->json(driversResource::collection($validate));
-        } catch (Throwable $e)
-        {
-            return response()->json($validate,404);
+            $response = [
+                'message' => "Drivers found!",
+                'status' => "OK",
+                'success' => true,
+                'data' => driversResource::collection($validate)
+                ];
+            return response()->json($response);
+
+            } catch (Exception $exception) {
+            $fail = [
+                'message' => "Drivers not found!",
+                'status' => "ERROR",
+                'success' => false
+                ];
+            return response()->json($fail);
         }
-    }
+
+}
 
     /**
      * Show the form for creating a new resource.
@@ -59,13 +66,26 @@ class driversController extends Controller
             'license_type' => ['required']
         ]);
 
-        if ($validated) {
+        try {
+
             $user = User::create($validated);
             $driver = Drivers::create($validated,$user->id);
-            return response()->success('Driver information deleted', Drivers::find($driver->id));
+            $response = [
+                'message' => "Driver information deleted",
+                'status' => "OK",
+                'success' => true,
+                'data' => Drivers::find($driver->id)
+                ];
+            return response()->json($response);
 
-        } else {
-            return response()->error('Driver information could not be deleted.', []);
+        } catch (\Exception $exception)
+        {
+            $fail = [
+                'message' => "Driver information could not be deleted.",
+                'status' => "ERROR",
+                'success' => false
+            ];
+            return response()->json($fail);
         }
     }
 
@@ -78,11 +98,22 @@ class driversController extends Controller
     public function show($id)
     {
         try {
-            return response()->json(new driversResource(Drivers::find($id)));
+            $response = [
+                'message' => "Found driver account!",
+                'status' => "OK",
+                'success' => true,
+                'data' => new driversResource(Drivers::find($id))
+                ];
+            return response()->json($response);
 
-        } catch (Throwable $throwable)
+        } catch (\Exception $exception)
         {
-            return response()->json([]);
+            $fail = [
+                'message' => "Could not find driver account!",
+                'status' => "ERROR",
+                'success' => false
+                ];
+            return response()->json($fail);
         }
 
     }
@@ -103,16 +134,31 @@ class driversController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Drivers  $drivers
-     * @return array
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(driversRequest $request, $id)
     {
         $driver = Drivers::query()->find($id);
-        if($driver) {
+        try {
+
             $driver->update($request->all());
-            return response()->success('Driver account updated!',new driverResource($driver));
-        } else {
-            return response()->error('Driver account could not be updated!',new driverResource($request));
+            $response = [
+                'message' => "Driver account updated!",
+                'status' => "OK",
+                'success' => true,
+                'data' => new driverResource($driver)
+            ];
+            return response()->json($response);
+
+
+        } catch (Exception $exception) {
+            $fail = [
+                'message' => "Driver account could not be updated!",
+                'status' => "ERROR",
+                'success' => false,
+                'data' => new driverResource($request)
+            ];
+            return response()->json($fail);
         }
     }
 
@@ -120,18 +166,28 @@ class driversController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Details  $details
-     * @return array
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
-        $drivers = Drivers::find($id);
-        $drivers->delete();
+        try {
 
-        if(!Drivers::find($drivers['id']))
-        {
-            return response()->success('Driver account deleted!',[]);
-        } else {
-            return response()->error('Driver account could not be deleted.',[]);
+            $drivers = Drivers::find($id);
+            $drivers->delete();
+            $response = [
+                'message' => "Driver account deleted!",
+                'status' => "OK",
+                'success' => true
+            ];
+            return response()->json($response);
+
+        } catch(Exception $exception) {
+            $fail = [
+                'message' => "Driver account could not be deleted.",
+                'status' => "ERROR",
+                'success' => false
+            ];
+            return response()->json($fail);
         }
     }
 }

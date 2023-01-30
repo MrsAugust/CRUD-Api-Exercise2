@@ -26,24 +26,24 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Response::macro('success', function($message,$data) {
+        Response::macro('success', function($response) {
             return response()->json([
-                'status' => 'OK',
-                'success' => true,
-                'message' => $message,
-                'data' => $data
+                'status' => $response->status,
+                'success' => $response->success,
+                'message' => $response->message,
+                'data' => $response->data
             ]);
         });
 
-    Response::macro('error', function($message,$data) {
-        return response()->json([
-                'status' => 'ERROR',
-                'success' => false,
-                'message' => $message,
-                'data' => $data
-            ]
-        );
-    });
+//    Response::macro('error', function(string $message) {
+//        return response()->json([
+//                'status' => 'ERROR',
+//                'success' => false,
+//                'message' => $message,
+//                'data' => []
+//            ]
+//        );
+//    });
         JsonResource::withoutWrapping();
     }
 

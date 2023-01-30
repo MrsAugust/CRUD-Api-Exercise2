@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\detailsRequest;
+use App\Http\Resources\userResource;
 use App\Models\Drivers;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -78,14 +78,11 @@ class usersController extends Controller
             'last_name' => 'required',
             'license_type' => 'required',
             'last_trip_date' => 'required');
+        try {
+            $validator = Validator::make($request->all(),$rules);
+            $driver = Drivers::find($id);
+            $user = User::find($driver->users_id);
 
-        $validator = Validator::make($request->all(),$rules);
-        $driver = Drivers::find($id);
-        $user = User::find($driver->users_id);
-
-        if($validator->fails() || !$user || !$driver) {
-            return response()->json([],404);
-        } else {
             $driver->home_address=$request->home_address;
             $user->first_name=$request->first_name;
             $user->last_name=$request->last_name;
@@ -93,20 +90,25 @@ class usersController extends Controller
             $driver->last_trip_date=$request->last_trip_date;
             $driver->update();
             $user->update();
-            return response()->json([]);
+
+            $response = [
+                'message' => "Driver account updated!",
+                'status' => "OK",
+                'success' => true,
+                'data' => new userResource($driver)
+            ];
+            return response()->json($response);
+
+        } catch(\Exception $exception) {
+            $fail = [
+                'message' => "Driver account could not be updated!",
+                'status' => "ERROR",
+                'success' => false,
+                'data' => new userResource(Drivers::find($id))
+            ];
+            return response()->json($fail);
         }
 
-
-//        if($driver && $validator)
-//        {
-//            $driver->update($request->all());
-//            $user = User::find($driver->users_id);
-//            $user->
-//            return response()->success('Driver information updated!',new detailsResource($detail));
-//
-//        } else {
-//            return response()->error('Driver information could not be updated!',new detailsResource($request));
-//        }
     }
 
     /**
@@ -117,8 +119,8 @@ class usersController extends Controller
      */
     public function destroy($id)
     {
+        try {
 
-        if(Drivers::query()->find($id)) {
             $drivers = Drivers::find($id);
             $drivers->home_address=null;
             $drivers->last_trip_date=null;
@@ -128,9 +130,19 @@ class usersController extends Controller
             $user->last_name=null;
             $drivers->update();
             $user->update();
-            return response()->json(['Driver account deleted!',$drivers,$user]);
-        } else {
-            return response()->json(['Driver account could not be deleted.',[]],404);
+            $response = [
+                'message' => "Driver information deleted!",
+                'status' => "OK",
+                'success' => true
+            ];
+            return response()->json($response);
+        } catch (\Exception $exception) {
+            $fail = [
+                'message' => "Driver information could not be deleted.",
+                'status' => "ERROR",
+                'success' => false
+            ];
+            return response()->json($fail);
         }
     }
 }
