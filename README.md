@@ -39,7 +39,7 @@ CREATE /driver/
         home_address: text
         first_name: text
         last_name: text
-        licence_type: char('A','B','C','D')
+        license_type: char('A','B','C','D')
 
 GET /drivers/
 
@@ -65,9 +65,10 @@ UPDATE /drivers/{id}/details/
     Updates the details of a specific driver record by id.
     Request Body:
         home_address: string
-        fist_name: string
+        first_name: string
         last_name: string
-        license_type: enum("A", "B", "C", "D") -> One of the four
+        license_type: array("A", "B", "C", "D") -> One of the four
+        last_trip_date: optional
 
 DELETE /drivers/{id}
 
@@ -83,10 +84,10 @@ CREATE /vehicle/
     Creates a new vehicle record.
     Request Body:
         id: integer
-        lisence_plate: string
+        license_plate_number: string
         vehicle_make: string
         vehicle_model: string
-        model_year: date(Y-m-d)
+        model_year: date(YYYY)
         insured: boolean/ 0, 1
         last_service: date(Y-m-d)
 
@@ -99,10 +100,10 @@ UPDATE /vehicle/{id}/
     Updates a specific vehicle record by id.
     Request Body:
         id: integer
-        lisence_plate: string
+        license_plate_number: string
         vehicle_make: string
         vehicle_model: string
-        model_year: date(Y-m-d)
+        model_year: date(YYYY)
         insured: boolean/ 0, 1
 
 DELETE /vehicle/{id}/
