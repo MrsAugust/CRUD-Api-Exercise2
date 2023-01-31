@@ -92,21 +92,21 @@ class usersController extends Controller
             $user->update();
 
             $response = [
-                'message' => "Driver account updated!",
                 'status' => "OK",
                 'success' => true,
+                'message' => "Driver account updated!",
                 'data' => new userResource($driver)
             ];
             return response()->json($response);
 
         } catch(\Exception $exception) {
             $fail = [
-                'message' => "Driver account could not be updated!",
                 'status' => "ERROR",
                 'success' => false,
+                'message' => "Driver account could not be updated!",
                 'data' => new userResource(Drivers::find($id))
             ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
 
     }
@@ -130,19 +130,21 @@ class usersController extends Controller
             $user->last_name=null;
             $drivers->update();
             $user->update();
+
             $response = [
-                'message' => "Driver information deleted!",
                 'status' => "OK",
-                'success' => true
+                'success' => true,
+                'message' => "Driver information deleted!"
             ];
             return response()->json($response);
         } catch (\Exception $exception) {
+
             $fail = [
-                'message' => "Driver information could not be deleted.",
                 'status' => "ERROR",
-                'success' => false
+                'success' => false,
+                'message' => "Driver information could not be deleted."
             ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
     }
 }

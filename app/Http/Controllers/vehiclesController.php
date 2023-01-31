@@ -22,19 +22,20 @@ class vehiclesController extends Controller
         try {
             $validate = Vehicles::all();
             $response = [
-                'message' => "Vehicles found!",
                 'status' => "OK",
                 'success' => true,
+                'message' => "Vehicles found!",
                 'data' => vehiclesResource::collection($validate)
             ];
             return response()->json($response);
         } catch (\Exception $exception) {
+
             $fail = [
-                'message' => "Vehicles not found!",
                 'status' => "ERROR",
-                'success' => false
+                'success' => false,
+                'message' => "Vehicles not found!"
             ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
 
     }
@@ -74,20 +75,21 @@ class vehiclesController extends Controller
             $vehicle = Vehicles::create($validated);
 
             $response = [
-                'message' => "Vehicle details updated!",
                 'status' => "OK",
                 'success' => true,
+                'message' => "Vehicle details updated!",
                 'data' => new vehiclesResource($vehicle)
             ];
             return response()->json($response);
         } catch (\Exception $exception) {
+
         $fail = [
-            'message' => "Vehicle details could not be updated.",
             'status' => "ERROR",
             'success' => false,
+            'message' => "Vehicle details could not be updated.",
             'data' => new vehiclesResource($request)
         ];
-        return response()->json($fail);
+        return response()->json($fail,404);
         }
 
     }
@@ -102,20 +104,20 @@ class vehiclesController extends Controller
     {
         try {
             $response = [
-                'message' => "Driver vehicle found!",
                 'status' => "OK",
                 'success' => true,
+                'message' => "Driver vehicle found!",
                 'data' => vehiclesResource::collection(Vehicles::all()->where('drivers_id',$id))
             ];
             return response()->json($response);
         } catch (\Exception $exception)
         {
             $fail = [
-                'message' => "Driver vehicle not found",
                 'status' => "ERROR",
-                'success' => false
+                'success' => false,
+                'message' => "Driver vehicle not found"
             ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
 
     }
@@ -155,21 +157,22 @@ class vehiclesController extends Controller
         $vehicle->update($request->all());
 
             $response = [
-                'message' => "Vehicle details updated!",
                 'status' => "OK",
                 'success' => true,
+                'message' => "Vehicle details updated!",
                 'data' => $vehicle
             ];
             return response()->json($response);
 
         } catch (\Exception $exception) {
+
             $fail = [
-                'message' => "Vehicle details could not be updated.",
                 'status' => "ERROR",
                 'success' => false,
+                'message' => "Vehicle details could not be updated.",
                 'data' => Vehicles::find($id)
             ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
     }
 
@@ -187,18 +190,20 @@ class vehiclesController extends Controller
         $vehicles->delete();
 
         $response = [
-            'message' => "Vehicle deleted!",
             'status' => "OK",
-            'success' => true
+            'success' => true,
+            'message' => "Vehicle deleted!"
             ];
+
             return response()->json($response);
         } catch (\Exception $exception) {
+
             $fail = [
-                'message' => "Vehicle could not be deleted.",
                 'status' => "ERROR",
-                'success' => false
+                'success' => false,
+                'message' => "Vehicle could not be deleted."
             ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
     }
 }

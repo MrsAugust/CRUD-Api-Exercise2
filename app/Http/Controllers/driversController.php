@@ -21,20 +21,20 @@ class driversController extends Controller
         try {
             $validate = Drivers::all();
             $response = [
-                'message' => "Drivers found!",
                 'status' => "OK",
                 'success' => true,
+                'message' => "Drivers found!",
                 'data' => driversResource::collection($validate)
                 ];
             return response()->json($response);
 
             } catch (Exception $exception) {
             $fail = [
-                'message' => "Drivers not found!",
                 'status' => "ERROR",
-                'success' => false
+                'success' => false,
+                'message' => "Drivers not found!"
                 ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
 
 }
@@ -71,9 +71,9 @@ class driversController extends Controller
             $user = User::create($validated);
             $driver = Drivers::create($validated,$user->id);
             $response = [
-                'message' => "Driver information deleted",
                 'status' => "OK",
                 'success' => true,
+                'message' => "Driver information deleted",
                 'data' => Drivers::find($driver->id)
                 ];
             return response()->json($response);
@@ -81,11 +81,11 @@ class driversController extends Controller
         } catch (\Exception $exception)
         {
             $fail = [
-                'message' => "Driver information could not be deleted.",
                 'status' => "ERROR",
-                'success' => false
+                'success' => false,
+                'message' => "Driver information could not be deleted."
             ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
     }
 
@@ -99,9 +99,9 @@ class driversController extends Controller
     {
         try {
             $response = [
-                'message' => "Found driver account!",
                 'status' => "OK",
                 'success' => true,
+                'message' => "Found driver account!",
                 'data' => new driversResource(Drivers::find($id))
                 ];
             return response()->json($response);
@@ -109,11 +109,11 @@ class driversController extends Controller
         } catch (\Exception $exception)
         {
             $fail = [
-                'message' => "Could not find driver account!",
                 'status' => "ERROR",
-                'success' => false
+                'success' => false,
+                'message' => "Could not find driver account!"
                 ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
 
     }
@@ -143,9 +143,9 @@ class driversController extends Controller
 
             $driver->update($request->all());
             $response = [
-                'message' => "Driver account updated!",
                 'status' => "OK",
                 'success' => true,
+                'message' => "Driver account updated!",
                 'data' => new driverResource($driver)
             ];
             return response()->json($response);
@@ -153,12 +153,12 @@ class driversController extends Controller
 
         } catch (Exception $exception) {
             $fail = [
-                'message' => "Driver account could not be updated!",
                 'status' => "ERROR",
                 'success' => false,
+                'message' => "Driver account could not be updated!",
                 'data' => new driverResource($request)
             ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
     }
 
@@ -175,19 +175,19 @@ class driversController extends Controller
             $drivers = Drivers::find($id);
             $drivers->delete();
             $response = [
-                'message' => "Driver account deleted!",
                 'status' => "OK",
-                'success' => true
+                'success' => true,
+                'message' => "Driver account deleted!"
             ];
             return response()->json($response);
 
         } catch(Exception $exception) {
             $fail = [
-                'message' => "Driver account could not be deleted.",
                 'status' => "ERROR",
-                'success' => false
+                'success' => false,
+                'message' => "Driver account could not be deleted."
             ];
-            return response()->json($fail);
+            return response()->json($fail,404);
         }
     }
 }
