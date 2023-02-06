@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\vehiclesRequest;
 use App\Http\Requests\StoreVehiclesRequest;
 use App\Http\Resources\vehiclesResource;
+use App\Models\Drivers;
 use App\Models\Vehicles;
 use http\Client\Request;
 use Illuminate\Support\Facades\Validator;
@@ -69,6 +70,8 @@ class vehiclesController extends Controller
             'drivers_id' => 'required'
         ]);
 
+        $driver = Drivers::query()->find($validated['drivers_id']);
+
         try
         {
 
@@ -77,7 +80,7 @@ class vehiclesController extends Controller
             $response = [
                 'status' => "OK",
                 'success' => true,
-                'message' => "Vehicle details updated!",
+                'message' => "Vehicle created!",
                 'data' => new vehiclesResource($vehicle)
             ];
             return response()->json($response);
@@ -86,7 +89,7 @@ class vehiclesController extends Controller
         $fail = [
             'status' => "ERROR",
             'success' => false,
-            'message' => "Vehicle details could not be updated.",
+            'message' => "Vehicle could not be created.",
             'data' => new vehiclesResource($request)
         ];
         return response()->json($fail,404);
@@ -103,11 +106,12 @@ class vehiclesController extends Controller
     public function show($id)
     {
         try {
+            $driver = Drivers::find($id);
             $response = [
                 'status' => "OK",
                 'success' => true,
                 'message' => "Driver vehicle found!",
-                'data' => vehiclesResource::collection(Vehicles::all()->where('drivers_id',$id))
+                'data' => vehiclesResource::collection(Vehicles::all()->where('drivers_id',$driver->id))
             ];
             return response()->json($response);
         } catch (\Exception $exception)

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\driverRequest;
 use App\Http\Requests\driversRequest;
 use App\Http\Resources\driverResource;
 use App\Http\Resources\driversResource;
 use App\Models\Drivers;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\Validator;
 
 class driversController extends Controller
 {
@@ -73,7 +75,7 @@ class driversController extends Controller
             $response = [
                 'status' => "OK",
                 'success' => true,
-                'message' => "Driver information deleted",
+                'message' => "Driver account created!",
                 'data' => Drivers::find($driver->id)
                 ];
             return response()->json($response);
@@ -83,7 +85,7 @@ class driversController extends Controller
             $fail = [
                 'status' => "ERROR",
                 'success' => false,
-                'message' => "Driver information could not be deleted."
+                'message' => "Driver account could not be created!"
             ];
             return response()->json($fail,404);
         }
@@ -136,12 +138,19 @@ class driversController extends Controller
      * @param  \App\Models\Drivers  $drivers
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(driversRequest $request, $id)
+    public function update(driverRequest $request, $id)
     {
-        $driver = Drivers::query()->find($id);
-        try {
+        $rules = array(
+            'id_number' => 'required',
+            'phone_number' => 'required'
+        );
 
-            $driver->update($request->all());
+        try {
+            $validator = Validator::make($request->all(),$rules);
+            $driver = Drivers::query()->find($id);
+            $driver->id_number=$request->id_number;
+            $driver->phone_number=$request->phone_number;
+            $driver->update();
             $response = [
                 'status' => "OK",
                 'success' => true,

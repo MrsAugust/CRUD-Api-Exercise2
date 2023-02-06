@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\driversRequest;
 use App\Http\Resources\userResource;
 use App\Models\Drivers;
 use App\Models\User;
@@ -70,7 +71,7 @@ class usersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(driversRequest $request, $id)
     {
         $rules = array(
             'home_address' => 'required',
@@ -94,7 +95,7 @@ class usersController extends Controller
             $response = [
                 'status' => "OK",
                 'success' => true,
-                'message' => "Driver account updated!",
+                'message' => "Driver information updated!",
                 'data' => new userResource($driver)
             ];
             return response()->json($response);
