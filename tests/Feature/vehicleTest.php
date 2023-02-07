@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Http\Resources\vehiclesResource;
+use App\Models\User;
 use App\Models\Vehicles;
 use App\Models\Drivers;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,7 +16,7 @@ class vehicleTest extends TestCase
 
     public function test_non_empty_vehicles_table()
     {
-//        $user = Vehicles::factory()->count(5)->create();
+        $user = Vehicles::factory()->count(5)->create();
         $response = $this->getJson('http://127.0.0.1:8000/api/vehicles');
         $response->assertStatus(200);//not found
         $response->assertJson([
@@ -23,7 +25,6 @@ class vehicleTest extends TestCase
             'message' => "Vehicles found!"
         ],true);
 
-//        $this->refreshTestDatabase();
     }
 
     public function test_get_vehicle_error()
@@ -35,29 +36,28 @@ class vehicleTest extends TestCase
             'success' => false,
             'message' => "Driver vehicle not found"
         ],true);
-//        $this->refreshTestDatabase();
     }
 
     public function test_get_vehicle()
     {
-        $user = $this->createData2();
-//        dd($user);
-        $driver = $user->first();
-//        dd($vehicle);
-        $response = $this->getJson('http://127.0.0.1:8000/api/driver/'.$driver['id'].'/vehicle/');
+        User::factory()->create();
+        Drivers::factory()->create();
+        $vehicle = Vehicles::factory()->create();
+
+        $response = $this->getJson('http://127.0.0.1:8000/api/driver/'.$vehicle['drivers_id'].'/vehicle/');
         $response->assertStatus(200);
         $response->assertJson([
             'status' => "OK",
             'success' => true,
             'message' => "Driver vehicle found!"
         ],true);
-//        $this->refreshTestDatabase();
     }
 
     public function test_update_vehicle()
     {
-        $user = Vehicles::factory()->count(5)->create();
-        $vehicle = $user->first();
+        User::factory()->create();
+        Drivers::factory()->create();
+        $vehicle = Vehicles::factory()->create();
 
         $response = $this->putJson('http://127.0.0.1:8000/api/vehicle/'.$vehicle['id'].'/',[
             "license_plate_number" => "CA12345678",
@@ -67,7 +67,7 @@ class vehicleTest extends TestCase
             "insured" => false,
             "service_date" => "2002-06-15 07:41:15",
             "capacity" => 3,
-            "drivers_id" => $vehicle['id']
+            "drivers_id" => $vehicle['drivers_id']
         ]);
         $response->assertStatus(200);
         $response->assertJson([
@@ -77,10 +77,35 @@ class vehicleTest extends TestCase
         ],true);
     }
 
+    public function test_update_vehicle_error()
+    {
+        User::factory()->create();
+        Drivers::factory()->create();
+        $vehicle = Vehicles::factory()->create();
+
+        $response = $this->putJson('http://127.0.0.1:8000/api/vehicle/'.$vehicle['id'].'/',[
+            "license_plate_number" => "CA1234567814562",
+            "vehicle_make" => "Honda",
+            "vehicle_model" => "Ballade",
+            "year" => "2003",
+            "insured" => false,
+            "service_date" => "2002-06-15 07:41:15",
+            "capacity" => 3,
+            "drivers_id" => $vehicle['drivers_id']
+        ]);
+        $response->assertStatus(404);
+        $response->assertJson([
+            'status' => "ERROR",
+            'success' => false,
+            'message' => "Vehicle details could not be updated."
+        ],true);
+    }
+
     public function test_delete_driver_vehicle()
     {
-        $user = Vehicles::factory()->count(5)->create();
-        $vehicle = $user->first();
+        User::factory()->create();
+        Drivers::factory()->create();
+        $vehicle = Vehicles::factory()->create();
 
         $response = $this->deleteJson('http://127.0.0.1:8000/api/vehicle/'.$vehicle['id'].'/');
         $response->assertStatus(200);
@@ -94,8 +119,8 @@ class vehicleTest extends TestCase
 
     public function test_create_vehicle()
     {
-        $user = Drivers::factory()->count(5)->create();
-        $vehicle = $user->first();
+        User::factory()->create();
+        $driver = Drivers::factory()->create();
 
         $response = $this->postJson('http://127.0.0.1:8000/api/vehicle/',[
             'license_plate_number' => 'CA145236',
@@ -105,7 +130,7 @@ class vehicleTest extends TestCase
             'insured' => true,
             'service_date' => '2013-09-04 21:35:45',
             'capacity' => 3,
-            'drivers_id' => $vehicle['id']
+            'drivers_id' => $driver['id']
         ]);
 
         $response->assertStatus(200);
@@ -116,12 +141,28 @@ class vehicleTest extends TestCase
         ],true);
     }
 
-    /**
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-     */
-    public function createData2(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function test_create_vehicle_error()
     {
-        return vehiclesResource::collection(Vehicles::factory()->count(5)->create());
+        User::factory()->create();
+        $driver = Drivers::factory()->create();
+
+        $response = $this->postJson('http://127.0.0.1:8000/api/vehicle/',[
+            'license_plate_number' => 'CA1452364153221',
+            'vehicle_make' => 'Toyota',
+            'vehicle_model' => 'Justice',
+            'year' => '2077',
+            'insured' => true,
+            'service_date' => '2013-09-04 21:35:45',
+            'capacity' => 3,
+            'drivers_id' => $driver['id']
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'status' => "ERROR",
+            'success' => false,
+            'message' => "Vehicle could not be created."
+        ],true);
     }
 
 }

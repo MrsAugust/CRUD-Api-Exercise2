@@ -188,6 +188,7 @@ class vehiclesController extends Controller
      */
     public function destroy($id)
     {
+
         try {
 
         $vehicles = Vehicles::find($id);

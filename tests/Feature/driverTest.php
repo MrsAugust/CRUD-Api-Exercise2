@@ -3,17 +3,18 @@
 namespace Tests\Feature;
 
 use App\Models\Drivers;
+use App\Models\User;
 use App\Models\Vehicles;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class driverTest extends TestCase
 {
-
     use RefreshDatabase;
+
     public function test_non_empty_drivers_table()
     {
-
         $response = $this->getJson('http://127.0.0.1:8000/api/drivers/');
         $response->assertStatus(200);
         $response->assertJson([
@@ -25,9 +26,10 @@ class driverTest extends TestCase
 
     public function test_get_driver()
     {
-        $user = $this->createData();
+        User::factory()->create();
+        $driver = Drivers::factory()->create();
 
-        $response = $this->getJson('http://127.0.0.1:8000/api/driver/1/');
+        $response = $this->getJson('http://127.0.0.1:8000/api/driver/'.$driver['id'].'/');
         $response->assertStatus(200);
         $response->assertJson([
             'status' => "OK",
@@ -39,19 +41,23 @@ class driverTest extends TestCase
 
     public function test_get_driver_error()
     {
-        $response = $this->getJson('http://127.0.0.1:8000/api/driver/1/');
+        User::factory()->create();
+        $driver = Drivers::factory()->create();
+
+        $response = $this->getJson('http://127.0.0.1:8000/api/driver/'.($driver['id']+1).'/');
         $response->assertStatus(404);
         $response->assertJson([
             'status' => "ERROR",
             'success' => false,
             'message' => "Could not find driver account!"
         ],true);
+
     }
 
     public function test_update_driver()
     {
-        $user = Drivers::factory()->count(5)->create();
-        $driver = $user->first();
+        User::factory()->create();
+        $driver = Drivers::factory()->create();
 
         $response = $this->putJson('http://127.0.0.1:8000/api/drivers/'.$driver['id'].'/',[
             'id_number' => '9236587459',
@@ -66,10 +72,28 @@ class driverTest extends TestCase
 
     }
 
+    public function test_update_driver_error()
+    {
+        User::factory()->create();
+        $driver = Drivers::factory()->create();
+
+        $response = $this->putJson('http://127.0.0.1:8000/api/drivers/'.$driver['id'].'/',[
+            'id_number' => '9236587452545',
+            'phone_number' => '0216987458abc452523512366abd'
+        ]);
+        $response->assertStatus(404);
+        $response->assertJson([
+            'status' => "ERROR",
+            'success' => false,
+            'message' => "Driver account could not be updated!"
+        ],true);
+
+    }
+
     public function test_update_driver_details()
     {
-        $user = Drivers::factory()->count(5)->create();
-        $driver = $user->first();
+        User::factory()->create();
+        $driver = Drivers::factory()->create();
 
         $response = $this->putJson('http://127.0.0.1:8000/api/drivers/'.$driver['id'].'/details',[
             'id_number' => '9236587459',
@@ -88,10 +112,32 @@ class driverTest extends TestCase
 
     }
 
+    public function test_update_driver_details_error()
+    {
+        User::factory()->create();
+        $driver = Drivers::factory()->create();
+
+        $response = $this->putJson('http://127.0.0.1:8000/api/drivers/'.$driver['id'].'/details',[
+            'id_number' => '9236587459',
+            'phone_number' => '0216987458',
+            'home_address' => '12 Kloof Street',
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'license_type' => 'BD'
+        ]);
+        $response->assertStatus(404);
+        $response->assertJson([
+            'status' => "ERROR",
+            'success' => false,
+            'message' => "Driver account could not be updated!"
+        ],true);
+
+    }
+
     public function test_delete_driver()
     {
-        $user = Drivers::factory()->count(5)->create();
-        $driver = $user->first();
+        User::factory()->create();
+        $driver = Drivers::factory()->create();
 
         $response = $this->deleteJson('http://127.0.0.1:8000/api/drivers/'.$driver['id'].'/');
         $response->assertStatus(200);
@@ -105,8 +151,8 @@ class driverTest extends TestCase
 
     public function test_delete_driver_details()
     {
-        $user = Drivers::factory()->count(5)->create();
-        $driver = $user->first();
+        User::factory()->create();
+        $driver = Drivers::factory()->create();
 
         $response = $this->deleteJson('http://127.0.0.1:8000/api/drivers/'.$driver['id'].'/details');
         $response->assertStatus(200);
@@ -137,11 +183,23 @@ class driverTest extends TestCase
         ],true);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
-     */
-    private function createData()
+    public function test_create_driver_error()
     {
-        return Vehicles::factory()->count(5)->create();
+        $response = $this->postJson('http://127.0.0.1:8000/api/driver/',[
+            'id_number' => '1234567891244562315235',
+            'phone_number' => '0216957845',
+            'home_address' => '1 Strand Street',
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'license_type' => 'BX'
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'status' => "ERROR",
+            'success' => false,
+            'message' => "Driver account could not be created!"
+        ],true);
     }
+
 }
