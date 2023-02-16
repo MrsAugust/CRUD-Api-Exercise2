@@ -7,6 +7,8 @@ use App\Http\Requests\StoreVehiclesRequest;
 use App\Http\Resources\vehiclesResource;
 use App\Models\Drivers;
 use App\Models\Vehicles;
+use DateTimeInterface;
+use DateTimeZone;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -29,20 +31,23 @@ class vehiclesController extends Controller
             $age = $request::query('age');
 
             if ($make) {
-                //get matching vehicle make name
+                //get matching vehicle makes with specific string name
                 $validate = $validate->where('vehicle_make', 'like', "%$make%")->get();
             }
 
             if($service_date) {
-
+                //get vehicles with service dates younger than the provided argument
+                $validate = $validate->where('service_date','>=',date($service_date.' 00:00:01'))->get();
             }
 
             if($age) {
                 //get vehicles released on a certain year
-                $validate = $validate->where('year','=',now()->subYear($age))->get();
+                $validate = $validate->where('year','=',now()->subYear()->year($age))->get();
             }
 
-            $validate = $validate->paginate(25);
+            if($validate->count()>25) {
+                $validate = $validate->paginate(25);
+            }
 
             $response = [
                 'status' => "OK",

@@ -27,7 +27,7 @@ class driversController extends Controller
             $name = $request::query("name");
             $address = $request::query("address");
             $vehicle_capacity = $request::query("vehicle_capacity");
-            $sort = $request::query("sort");
+            $sort = $request::query("sort_by");
             $order = $request::query("order");
 
             if ($name) {
@@ -48,7 +48,7 @@ class driversController extends Controller
             if ($vehicle_capacity) {
                 //get matching capacity
                 $validate = $validate->whereHas('vehicles',function ($query) use($vehicle_capacity) {
-                    $query->where('capacity', 'like', "%$vehicle_capacity%");
+                    $query->where('capacity', '=', "$vehicle_capacity");
                 })->get();
             }
 
@@ -56,12 +56,20 @@ class driversController extends Controller
                 //sorts the data by the $first_name column
                 if($order == "desc") {
                     //sorts the data in descending order
+                    $validate = $validate->get()->sortByDesc(function ($query){
+                        return $query->users->first_name;
+                    })->all();
                 } else {
                     //sort the data in ascending order by default
+                    $validate = $validate->get()->sortBy(function ($query){
+                        return $query->users->first_name;
+                    })->all();
                 }
             }
 
-            $validate = $validate->paginate(25);
+//            if($validate->count()>25){
+//                $validate = $validate->paginate(25);
+//            }
 
             $response = [
                 'status' => "OK",

@@ -204,6 +204,29 @@ class driverTest extends TestCase
 
     public function test_response_structure(){
 
+        $response = $this->postJson('http://127.0.0.1:8000/api/driver/',[
+            'id_number' => '9234567891248',
+            'phone_number' => '216957845',
+            'home_address' => '1 Strand Street',
+            'first_name' => 'Jack',
+            'last_name' => 'Deer',
+            'license_type' => 'C'
+        ]);
+
+        $this->assertDatabaseHas('drivers',[
+            'id' => $response->id,
+            'id_number' => '9234567891248',
+            'phone_number' => '216957845',
+            'home_address' => '1 Strand Street',
+            'license_type' => 'C'
+        ]);
+
+        $this->assertDatabaseHas('users',[
+            'id' => $response->users_id,
+            'first_name' => 'Jack',
+            'last_name' => 'Deer',
+        ]);
+
     }
     public function test_response_items(){
 
