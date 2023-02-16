@@ -18,6 +18,8 @@ class Drivers extends Model
         'license_type'
     ];
 
+    protected $filters = ['home_address'];
+
     public static function create(array $array,$id)
     {
 

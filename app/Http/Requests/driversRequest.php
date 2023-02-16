@@ -19,6 +19,7 @@ class driversRequest extends FormRequest
      */
     public function rules()
     {
+//        $license = ['A','a','B','b','C','c','D','d'];
         return [
             'id_number' => ['required'],
             'phone_number' => ['required'],

@@ -20,6 +20,8 @@ class Vehicles extends Model
         'capacity'
     ];
 
+    protected $filters = ['vehicle_make', 'service_date', 'capacity', 'year'];
+
     protected $casts = [ 'insured' => 'boolean' ];
 
     public static function create(array $array)

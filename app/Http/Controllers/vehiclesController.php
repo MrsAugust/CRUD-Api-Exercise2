@@ -7,8 +7,9 @@ use App\Http\Requests\StoreVehiclesRequest;
 use App\Http\Resources\vehiclesResource;
 use App\Models\Drivers;
 use App\Models\Vehicles;
-use http\Client\Request;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class vehiclesController extends Controller
 {
@@ -18,10 +19,31 @@ class vehiclesController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $validate = Vehicles::all();
+            $validate = Vehicles::query();
+
+            $make = $request::query('make');
+            $service_date = $request::query('service_date');
+            $age = $request::query('age');
+
+            if ($make) {
+                //get matching vehicle make name
+                $validate = $validate->where('vehicle_make', 'like', "%$make%")->get();
+            }
+
+            if($service_date) {
+
+            }
+
+            if($age) {
+                //get vehicles released on a certain year
+                $validate = $validate->where('year','=',now()->subYear($age))->get();
+            }
+
+            $validate = $validate->paginate(25);
+
             $response = [
                 'status' => "OK",
                 'success' => true,
@@ -29,7 +51,8 @@ class vehiclesController extends Controller
                 'data' => vehiclesResource::collection($validate)
             ];
             return response()->json($response);
-        } catch (\Exception $exception) {
+        }
+        catch (\Exception $exception) {
 
             $fail = [
                 'status' => "ERROR",
@@ -38,7 +61,6 @@ class vehiclesController extends Controller
             ];
             return response()->json($fail,404);
         }
-
     }
 
     /**

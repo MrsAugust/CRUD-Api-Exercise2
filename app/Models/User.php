@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password'
     ];
 
+    protected $filters = ['first_name', 'last_name'];
     /**
      * The attributes that should be hidden for serialization.
      *

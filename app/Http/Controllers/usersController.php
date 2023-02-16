@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\driversRequest;
+use App\Http\Requests\StoreDriversRequest;
 use App\Http\Resources\userResource;
 use App\Models\Drivers;
 use App\Models\User;
@@ -71,7 +72,7 @@ class usersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(driversRequest $request, $id)
+    public function update(StoreDriversRequest $request, $id)
     {
         $rules = array(
             'home_address' => 'required',

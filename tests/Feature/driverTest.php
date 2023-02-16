@@ -202,4 +202,18 @@ class driverTest extends TestCase
         ],true);
     }
 
+    public function test_response_structure(){
+
+    }
+    public function test_response_items(){
+
+    }
+    public function test_database_structure(){
+
+    }
+
+    public function test_database_items(){
+
+    }
+
 }

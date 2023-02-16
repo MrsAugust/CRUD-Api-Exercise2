@@ -9,7 +9,9 @@ use App\Http\Resources\driversResource;
 use App\Models\Drivers;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class driversController extends Controller
 {
@@ -18,28 +20,66 @@ class driversController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $validate = Drivers::all();
+            $validate = Drivers::with('users','vehicles');
+            $name = $request::query("name");
+            $address = $request::query("address");
+            $vehicle_capacity = $request::query("vehicle_capacity");
+            $sort = $request::query("sort");
+            $order = $request::query("order");
+
+            if ($name) {
+                //get matching name
+                $validate = $validate->whereHas('users',function ($query) use($name) {
+                    $query->where('first_name', 'like', "%$name%")
+                        ->orWhere('last_name', 'like', "%$name%");
+                })->get();
+            }
+
+            if ($address) {
+                //get matching address
+                $validate = $validate->where(function($query) use($address) {
+                    $query->where('home_address', 'like', "%$address%");
+                })->get();
+            }
+
+            if ($vehicle_capacity) {
+                //get matching capacity
+                $validate = $validate->whereHas('vehicles',function ($query) use($vehicle_capacity) {
+                    $query->where('capacity', 'like', "%$vehicle_capacity%");
+                })->get();
+            }
+
+            if($sort) {
+                //sorts the data by the $first_name column
+                if($order == "desc") {
+                    //sorts the data in descending order
+                } else {
+                    //sort the data in ascending order by default
+                }
+            }
+
+            $validate = $validate->paginate(25);
+
             $response = [
                 'status' => "OK",
                 'success' => true,
                 'message' => "Drivers found!",
                 'data' => driversResource::collection($validate)
-                ];
+            ];
             return response()->json($response);
-
-            } catch (Exception $exception) {
-            $fail = [
-                'status' => "ERROR",
-                'success' => false,
-                'message' => "Drivers not found!"
-                ];
-            return response()->json($fail,404);
         }
-
-}
+        catch (Exception $exception) {
+        $fail = [
+            'status' => "ERROR",
+            'success' => false,
+            'message' => "Drivers not found!"
+            ];
+        return response()->json($fail,404);
+        }
+    }
 
     /**
      * Show the form for creating a new resource.
