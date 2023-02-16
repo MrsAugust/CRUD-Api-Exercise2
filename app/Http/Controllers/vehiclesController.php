@@ -37,17 +37,17 @@ class vehiclesController extends Controller
 
             if($service_date) {
                 //get vehicles with service dates younger than the provided argument
-                $validate = $validate->where('service_date','>=',date($service_date.' 00:00:01'))->get();
+                $validate = $validate->where('service_date','<=',date($service_date).' 00:00:01')->get();
             }
 
             if($age) {
                 //get vehicles released on a certain year
-                $validate = $validate->where('year','=',now()->subYear()->year($age))->get();
+                $validate = $validate->where('year','=',now()->subYears($age))->get();
             }
 
-            if($validate->count()>25) {
-                $validate = $validate->paginate(25);
-            }
+//            if($validate->count()>25) {
+//                $validate = $validate->paginate(25);
+//            }
 
             $response = [
                 'status' => "OK",
